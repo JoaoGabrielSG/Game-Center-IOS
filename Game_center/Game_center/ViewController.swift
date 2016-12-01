@@ -79,6 +79,7 @@ class ViewController: UIViewController, GKGameCenterControllerDelegate {
         let sScore = GKScore(leaderboardIdentifier: leaderboardID)
         sScore.value = Int64(score)
         
+        
         GKScore.report([sScore], withCompletionHandler: {(error: Error?) -> Void in
             if error != nil {
                 print(error!.localizedDescription)
