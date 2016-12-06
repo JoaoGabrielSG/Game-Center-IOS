@@ -22,6 +22,8 @@ class ViewController: UIViewController, GKGameCenterControllerDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+
+        
         self.authenticateLocalPlayer()
     }
 
@@ -85,9 +87,12 @@ class ViewController: UIViewController, GKGameCenterControllerDelegate {
                 print(error!.localizedDescription)
             } else {
                 print("Score submitted")
+                self.updateAchivements()
                 
             }
         })
+        
+        self.updateAchivements()
     }
     
     func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
@@ -101,6 +106,71 @@ class ViewController: UIViewController, GKGameCenterControllerDelegate {
         gcVC.leaderboardIdentifier = "Treino_classificacao"//Put here the ID what you put in itunes connect.
         self.present(gcVC, animated: true, completion: nil)
     }
+    
+//    @IBAction func updateAchie(_ sender: UIButton) {
+//        
+//        
+//    }
+    
+    func updateAchivements() {
+        
+        var achivementsIndentifier: String = ""
+        var progressPercentage = 0.0
+        var progressInLevelAchievement = false
+        
+        var levelAchievement:GKAchievement? = nil
+        var scoreAchievement:GKAchievement? = nil
+        
+        if(score >= 25){
+            progressPercentage = Double(score * 100 / 25)
+            achivementsIndentifier = "conquista_3"
+            progressInLevelAchievement = true
+        }
+        if (score >= 40) {
+            progressPercentage = Double(score * 100 / 40)
+            achivementsIndentifier = "conquista"
+            progressInLevelAchievement = true
+        }
+        
+        if (progressInLevelAchievement) {
+            levelAchievement = GKAchievement.init(identifier: achivementsIndentifier)
+            
+            levelAchievement?.percentComplete = progressPercentage
+            
+            print(progressPercentage)
+            
+            
+        }
+        
+        scoreAchievement = GKAchievement.init(identifier: achivementsIndentifier)
+        scoreAchievement?.percentComplete = progressPercentage
+        
+        let achivements: Array = progressInLevelAchievement ? [levelAchievement, scoreAchievement] : [scoreAchievement]
+        
+        GKAchievement.report(achivements as! [GKAchievement], withCompletionHandler: {(error: Error?) -> Void in
+            if (error != nil){
+                print(error!)
+            }else{
+                print("\n\n achivementsIndentifier: \(achivementsIndentifier) \n\n")
+            }
+        })
+    }
+    
+    
+    
+    func resetAchievements() {
+        GKAchievement.resetAchievements { (error) in
+            if(error != nil){
+                print(error)
+            }else{
+                print("reset de achievements")
+            }
+        }
+    }
 
+    @IBAction func resetAction(_ sender: UIButton) {
+        
+        self.resetAchievements()
+    }
 }
 
